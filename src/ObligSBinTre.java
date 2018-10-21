@@ -1,11 +1,16 @@
 import java.util.*;
-public class ObligSBinTre<T> implements Beholder<T>
-{
-    private static final class Node<T> // en indre nodeklasse
+public class ObligSBinTre<T> implements Beholder<T> {
+
+    /**
+     * En indre nodeklasse
+     * @param <T>
+     */
+    private static final class Node<T>
     {
         private T verdi; // nodens verdi
         private Node<T> venstre, høyre; // venstre og høyre barn
         private Node<T> forelder; // forelder
+
         // konstruktør
         private Node(T verdi, Node<T> v, Node<T> h, Node<T> forelder)
         {
@@ -20,12 +25,18 @@ public class ObligSBinTre<T> implements Beholder<T>
         @Override
         public String toString(){ return "" + verdi;}
     } // class Node
+
+    /**
+     * Instansvariabler for klasse beholder
+     */
     private Node<T> rot; // peker til rotnoden
     private int antall; // antall noder
     private int endringer; // antall endringer
     private final Comparator<? super T> comp; // komparator
-    public ObligSBinTre(Comparator<? super T> c) // konstruktør
-    {
+
+    // konstruktør
+    public ObligSBinTre(Comparator<? super T> c) {
+
         rot = null;
         antall = 0;
         comp = c;
@@ -34,7 +45,30 @@ public class ObligSBinTre<T> implements Beholder<T>
     @Override
     public boolean leggInn(T verdi)
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        Objects.requireNonNull("Nullverdier er ikke tillat!");
+
+        Node<T> node = rot, parent = null;
+        int c = 0;
+
+        // Flytter node nedover i treet til den kommer "faller ut".
+        // Dersom verdien som skal legges inn er større enn gjeldende node flyttes node til venstre barn,
+        // ellers flyttes node til høyre barn. Dette gjøres til node er null. Da vil parent holde på node
+        //sin siste posisjon. Parent vil dermed bli node sin forelder.
+        while (node != null) {
+            parent = node;
+            c = comp.compare(verdi, node.verdi);
+            node = c < 0 ? node.venstre : node.høyre;
+        }
+
+        //lager en ny node med parameter som verdi og parent som forelder
+        node = new Node<>(verdi, parent);
+
+        if (parent == null) rot = node;             // treet er tomt. Node blir rot.
+        else if (c < 0) parent.venstre = node;      // node blir venstre barn
+        else parent.høyre = node;                   // node blir høyre barn
+        antall++;                                   //øker antall med 1;
+
+        return true;
     }
 
     @Override
