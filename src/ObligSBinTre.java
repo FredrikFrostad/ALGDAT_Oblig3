@@ -105,7 +105,24 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public int antall(T verdi)
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        int antall = 0;
+        java.util.Deque<Node<T>> stack = new java.util.ArrayDeque<>(this.antall);
+        stack.addFirst(rot);
+
+        while (!stack.isEmpty()) {
+
+            Node<T> node = stack.removeFirst();
+            if (node.verdi.equals(verdi)) antall++;
+
+            if (node.venstre != null) {
+                stack.addFirst(node.venstre);
+            }
+            if (node.høyre != null) {
+                stack.addFirst(node.høyre);
+            }
+        }
+
+        return antall;
     }
 
     @Override
@@ -120,9 +137,16 @@ public class ObligSBinTre<T> implements Beholder<T> {
         throw new UnsupportedOperationException("Ikke kodet ennå!");
     }
 
-    private static <T> Node<T> nesteInorden(Node<T> p)
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    private static <T> Node<T> nesteInorden(Node<T> p)  {
+
+        Node<T> node = p;
+
+        while (node != null && !node.equals(p)) {
+            node = p.venstre;
+
+
+        }
+        return p;
     }
 
     @Override
@@ -160,6 +184,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
     {
         throw new UnsupportedOperationException("Ikke kodet ennå!");
     }
+
 
     @Override
     public Iterator<T> iterator()
