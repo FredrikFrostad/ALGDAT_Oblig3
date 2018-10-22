@@ -75,10 +75,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
     public boolean inneholder(T verdi)
     {
         if (verdi == null) return false;
+
         Node<T> p = rot;
+
         while (p != null)
         {
             int cmp = comp.compare(verdi, p.verdi);
+
             if (cmp < 0) p = p.venstre;
             else if (cmp > 0) p = p.høyre;
             else return true;
@@ -139,20 +142,51 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
-        Node<T> node = p;
+        Node<T> gjeldende = p, forelder, treff = null;
+        while (gjeldende != null) {
 
-        while (node != null && !node.equals(p)) {
-            node = p.venstre;
+            //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
+            if (gjeldende.venstre == null) {
+                //Inorder print eller sjekk
+                if (treff != null) return gjeldende;
+                if (gjeldende.equals(p)) treff = gjeldende;
+                gjeldende = gjeldende.høyre;
+            }else
+                {
+                forelder = gjeldende.venstre;
 
+                while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
 
+                if (forelder.høyre == null) {
+                    forelder.høyre = gjeldende;
+                    gjeldende = gjeldende.venstre;
+                }else {
+                    forelder.høyre = null;
+                    //Inorder print eller sjekk
+                    if (treff != null) return gjeldende;
+                    if (gjeldende.equals(p)) treff = gjeldende;
+                    gjeldende = gjeldende.høyre;
+                }
+            }
         }
-        return p;
+        return null;
     }
+
 
     @Override
     public String toString()
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Node<T> node = rot;
+        sb.append(node.verdi);
+        while (node != null) {
+            node = nesteInorden(node);
+            if (node != null) sb.append(",").append(node.verdi);
+        }
+        sb.append("]");
+
+        return sb.toString();
     }
 
     public String omvendtString()
@@ -221,4 +255,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
             throw new UnsupportedOperationException("Ikke kodet ennå!");
         }
     } // BladnodeIterator
+
+    public static void main(String[] args) {
+        ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
+        int[] a = {4,7,2,9,4,10,8,7,4,6,1};
+        for (int verdi : a) tre.leggInn(verdi);
+
+        System.out.println(tre);
+    }
 } // ObligSBinTre
