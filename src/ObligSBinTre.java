@@ -145,12 +145,14 @@ public class ObligSBinTre<T> implements Beholder<T> {
         Node<T> gjeldende = p, forelder, treff = null;
         while (gjeldende != null) {
 
+
+
             //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
             if (gjeldende.venstre == null) {
-                //Inorder print eller sjekk
-                if (treff != null) return gjeldende;
-                if (gjeldende.equals(p)) treff = gjeldende;
-                gjeldende = gjeldende.høyre;
+                //Inorder print eller sjekki
+                return gjeldende;
+                //gjeldende = gjeldende.høyre;
+
             }else
                 {
                 forelder = gjeldende.venstre;
@@ -163,27 +165,28 @@ public class ObligSBinTre<T> implements Beholder<T> {
                 }else {
                     forelder.høyre = null;
                     //Inorder print eller sjekk
-                    if (treff != null) return gjeldende;
-                    if (gjeldende.equals(p)) treff = gjeldende;
-                    gjeldende = gjeldende.høyre;
+                    System.out.println(gjeldende.verdi);
+                    return gjeldende;
+                    //gjeldende = gjeldende.høyre;
                 }
             }
         }
         return null;
     }
 
-
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        Node<T> node = rot;
+        Node<T> node = nesteInorden(rot);
         sb.append(node.verdi);
+
         while (node != null) {
             node = nesteInorden(node);
             if (node != null) sb.append(",").append(node.verdi);
         }
+
         sb.append("]");
 
         return sb.toString();
@@ -261,6 +264,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4,7,2,9,4,10,8,7,4,6,1};
         for (int verdi : a) tre.leggInn(verdi);
 
+        //nesteInorden(tre.rot);
         System.out.println(tre);
     }
 } // ObligSBinTre
