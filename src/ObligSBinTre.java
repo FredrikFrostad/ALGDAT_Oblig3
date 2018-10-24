@@ -218,12 +218,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public int fjernAlle(T verdi) {
 
-        if (verdi == null) return 0;
+        if (verdi == null || rot == null) return 0;
 
         int antallFjernet = 0;
 
         while (inneholder(verdi)) {
             fjern(verdi);
+            antallFjernet++;
         }
 
         return antallFjernet;
@@ -266,7 +267,21 @@ public class ObligSBinTre<T> implements Beholder<T> {
     @Override
     public void nullstill()
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        if (antall < 1) return;
+            rekursivTravers(rot);
+            antall = 0;
+            rot = null;
+    }
+
+    private void rekursivTravers(Node<T> rot) {
+        if (rot.venstre != null)
+            rekursivTravers(rot.venstre);
+        if (rot.høyre!= null)
+            rekursivTravers(rot.høyre);
+
+        rot.venstre = null;
+        rot.høyre = null;
+        rot.forelder = null;
     }
 
 
@@ -403,15 +418,15 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public static void main(String[] args) {
         ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
-        int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
-        for (int verdi : a) tre.leggInn(verdi);
+        //int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
+        //for (int verdi : a) tre.leggInn(verdi);
+//
+        //Node<Integer> node = tre.rot;
 
-        Node<Integer> node = tre.rot;
-
+        System.out.println();
+        //tre.nullstill();
         System.out.println(tre);
-        tre.fjernAlle(4);
-        System.out.println(tre);
-        System.out.println(tre.omvendtString());
+        //System.out.println(tre.omvendtString());
     }
 
     static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}

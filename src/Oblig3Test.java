@@ -395,6 +395,7 @@ public class Oblig3Test
 
         s = tre.toString();
 
+
         if (!s.equals("[]"))
         {
             antallFeil++;
