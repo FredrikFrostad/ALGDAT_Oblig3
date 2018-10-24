@@ -142,41 +142,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
 
 
-
     private static <T> Node<T> nesteInorden(Node<T> p)  {
-
-        Node<T> gjeldende = p, forelder, treff = null;
-
-        while (gjeldende.forelder != null) gjeldende = gjeldende.forelder;
-        while (gjeldende != null) {
-
-            //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
-            if (gjeldende.venstre == null) {
-                //Inorder print eller sjekki
-                System.out.println(gjeldende.verdi);
-                gjeldende = gjeldende.høyre;
-
-            }else
-                {
-                forelder = gjeldende.venstre;
-
-                while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
-
-                if (forelder.høyre == null) {
-                    forelder.høyre = gjeldende;
-                    gjeldende = gjeldende.venstre;
-                }else {
-                    forelder.høyre = null;
-                    //Inorder print eller sjekk
-                    System.out.println(gjeldende.verdi);
-                    gjeldende = gjeldende.høyre;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static <T> Node<T> nesteInorden2(Node<T> p)  {
 
 
         if (p.høyre != null) {
@@ -199,18 +165,19 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
 
     @Override
-    public String toString()
-    {
+    public String toString() {
+        Node<T> node = rot;
+        if (node == null) return "[]";
+
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        Node<T> node = rot;
 
         while (node.venstre != null) node = node.venstre;
         sb.append(node.verdi);
 
         while (node != null) {
-            node = nesteInorden2(node);
-            if (node != null) sb.append(",").append(node.verdi);
+            node = nesteInorden(node);
+            if (node != null) sb.append(", ").append(node.verdi);
         }
 
         sb.append("]");
@@ -220,7 +187,27 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public String omvendtString()
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        Node<T> node = rot;
+        if (node ==null) return "[]";
+
+        Deque<T> stack = new ArrayDeque<>();
+
+        while (node.venstre != null) node = node.venstre;
+        stack.add(node.verdi);
+
+        while (node != null) {
+            node = nesteInorden(node);
+            if (node != null) stack.add(node.verdi);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(stack.removeLast());
+
+        while (!stack.isEmpty()) { sb.append(", ").append(stack.removeLast());
+        }
+
+        sb.append("]");
+        return sb.toString();
     }
 
     public String høyreGren()
@@ -291,12 +278,44 @@ public class ObligSBinTre<T> implements Beholder<T> {
         for (int verdi : a) tre.leggInn(verdi);
 
         System.out.println(tre);
-        //Node<Integer> test = tre.rot;
-        //while (test.venstre != null) test = test.venstre;
-        //System.out.println(test.verdi);
-        //while (test != null) {
-        //    test = nesteInorden2(test);
-        //    if (test != null)System.out.println(test.verdi);
-        //}
+        System.out.println(tre.omvendtString());
     }
 } // ObligSBinTre
+
+//************************ GJEMMESTED FOR GULL OG TRYLLETRIXX ************************************
+
+/*
+
+    private static <T> Node<T> nesteInorden(Node<T> p)  {
+
+        Node<T> gjeldende = p, forelder, treff = null;
+
+        while (gjeldende.forelder != null) gjeldende = gjeldende.forelder;
+        while (gjeldende != null) {
+
+            //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
+            if (gjeldende.venstre == null) {
+                //Inorder print eller sjekki
+                System.out.println(gjeldende.verdi);
+                gjeldende = gjeldende.høyre;
+
+            }else
+                {
+                forelder = gjeldende.venstre;
+
+                while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
+
+                if (forelder.høyre == null) {
+                    forelder.høyre = gjeldende;
+                    gjeldende = gjeldende.venstre;
+                }else {
+                    forelder.høyre = null;
+                    //Inorder print eller sjekk
+                    System.out.println(gjeldende.verdi);
+                    gjeldende = gjeldende.høyre;
+                }
+            }
+        }
+        return null;
+    }
+*/
