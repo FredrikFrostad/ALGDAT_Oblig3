@@ -150,8 +150,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
             //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
             if (gjeldende.venstre == null) {
                 //Inorder print eller sjekki
-                return gjeldende;
-                //gjeldende = gjeldende.høyre;
+                System.out.println(gjeldende.verdi);
+                gjeldende = gjeldende.høyre;
 
             }else
                 {
@@ -166,8 +166,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
                     forelder.høyre = null;
                     //Inorder print eller sjekk
                     System.out.println(gjeldende.verdi);
-                    return gjeldende;
-                    //gjeldende = gjeldende.høyre;
+                    gjeldende = gjeldende.høyre;
                 }
             }
         }
@@ -264,7 +263,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4,7,2,9,4,10,8,7,4,6,1};
         for (int verdi : a) tre.leggInn(verdi);
 
-        //nesteInorden(tre.rot);
-        System.out.println(tre);
+        //System.out.println(tre);
     }
 } // ObligSBinTre
