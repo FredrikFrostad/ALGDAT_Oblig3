@@ -93,40 +93,56 @@ public class ObligSBinTre<T> implements Beholder<T> {
     public boolean fjern(T verdi) {
 
         if (rot == null) return false;
+        if (inneholder(verdi)) {
+            rot = fjernVerdiRekursivt(rot, verdi, this);
+            antall--;
+        }
 
-        rot = fjernVerdiRekursivt(rot, verdi, this);
 
-        return true;
+
+        return false;
     }
 
     private <T> Node<T> fjernVerdiRekursivt(Node<T> node, T verdi, ObligSBinTre<T> tre) {
 
-        Node<T> c = node;
+        Node<T> p = node;
 
-        int cmp = tre.comp.compare(verdi,node.verdi);
-        if (node.venstre != null && cmp < 0)
-            node.venstre = fjernVerdiRekursivt(node.venstre, node.verdi, tre);
+        int cmp = tre.comp.compare(p.verdi, verdi);
+        if (cmp > 0) {
+            p.venstre = fjernVerdiRekursivt(p.venstre, verdi, tre);
+        }
 
-        else if (node.høyre != null && cmp > 0)
-            node.høyre = fjernVerdiRekursivt(node.høyre, verdi, tre);
+        else if (cmp < 0) {
+            p.høyre = fjernVerdiRekursivt(p.høyre, verdi, tre);
+        }
 
         else {
 
-            if (node.venstre == null) return node.høyre;
+            if (p.venstre == null && p.høyre == null) {
+                p = null;
+            }
 
-            else if (node.høyre == null) return node.venstre;
+            else if (p.høyre == null) {
+                p = p.venstre;
+            }
 
-            Node<T> temp = nesteInorden(node);
-            node.verdi = temp.verdi;
+            else if (p.venstre == null) {
+                p = p.høyre;
+            }
 
-            node.høyre = fjernVerdiRekursivt(node.høyre, node.verdi, tre);
-
+            else {
+                //TODO: bytt ut denne metoden hvis det ikke virker
+                Node<T> temp = nesteInorden(p.høyre);
+                p.verdi = temp.verdi;
+                p.høyre = fjernVerdiRekursivt(p.høyre, temp.verdi, tre);
+            }
 
         }
 
-        return node;
+        return p;
     }
 
+    //TODO: fjern denne hvis den ikke blir brukt
     private void fjernBladnode(Node<T> node) {
         Node<T> forelder = node.forelder;
 
@@ -338,8 +354,9 @@ public class ObligSBinTre<T> implements Beholder<T> {
         Node<Integer> node = tre.rot;
 
         System.out.println(tre);
-        tre.fjern(7);
+        tre.fjern(2);
         System.out.println(tre);
+        System.out.println(tre.omvendtString());
     }
 
     static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}
