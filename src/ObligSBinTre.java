@@ -140,12 +140,15 @@ public class ObligSBinTre<T> implements Beholder<T> {
         throw new UnsupportedOperationException("Ikke kodet ennå!");
     }
 
+
+
+
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
         Node<T> gjeldende = p, forelder, treff = null;
+
+        while (gjeldende.forelder != null) gjeldende = gjeldende.forelder;
         while (gjeldende != null) {
-
-
 
             //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
             if (gjeldende.venstre == null) {
@@ -264,5 +267,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
         for (int verdi : a) tre.leggInn(verdi);
 
         //System.out.println(tre);
+        nesteInorden(tre.rot.venstre);
     }
 } // ObligSBinTre
