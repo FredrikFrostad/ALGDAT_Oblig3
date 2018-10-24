@@ -47,25 +47,25 @@ public class ObligSBinTre<T> implements Beholder<T> {
     {
         Objects.requireNonNull("Nullverdier er ikke tillat!");
 
-        Node<T> node = rot, parent = null;
+        Node<T> node = rot, forelder = null;
         int c = 0;
 
         // Flytter node nedover i treet til den kommer "faller ut".
         // Dersom verdien som skal legges inn er større enn gjeldende node flyttes node til venstre barn,
-        // ellers flyttes node til høyre barn. Dette gjøres til node er null. Da vil parent holde på node
+        // ellers flyttes node til høyre barn. Dette gjøres til node er null. Da vil forelder holde på node
         //sin siste posisjon. Parent vil dermed bli node sin forelder.
         while (node != null) {
-            parent = node;
+            forelder = node;
             c = comp.compare(verdi, node.verdi);
             node = c < 0 ? node.venstre : node.høyre;
         }
 
-        //lager en ny node med parameter som verdi og parent som forelder
-        node = new Node<>(verdi, parent);
+        //lager en ny node med parameter som verdi og forelder som forelder
+        node = new Node<>(verdi, forelder);
 
-        if (parent == null) rot = node;             // treet er tomt. Node blir rot.
-        else if (c < 0) parent.venstre = node;      // node blir venstre barn
-        else parent.høyre = node;                   // node blir høyre barn
+        if (forelder == null) rot = node;             // treet er tomt. Node blir rot.
+        else if (c < 0) forelder.venstre = node;      // node blir venstre barn
+        else forelder.høyre = node;                   // node blir høyre barn
         antall++;                                   //øker antall med 1;
 
         return true;
@@ -90,9 +90,35 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
     @Override
-    public boolean fjern(T verdi)
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public boolean fjern(T verdi) {
+
+        return true;
+    }
+
+    private void fjernBladnode(Node<T> node) {
+        Node<T> forelder = node.forelder;
+
+        if (forelder.venstre.equals(node)) forelder.venstre = null;
+        else forelder.høyre = null;
+
+        node.verdi = null;
+        node.forelder = null;
+        node = null;
+
+    }
+
+    private void fjernNodeEttBarn(Node<T> node, Node<T> barn) {
+
+        if (node.venstre.equals(barn)) node.venstre = null;
+        else node.høyre = null;
+
+        node.verdi = barn.verdi;
+        barn.forelder = null;
+        barn = null;
+    }
+
+    private void fjernNodeToBarn(Node<T> node) {
+
     }
 
     public int fjernAlle(T verdi)
@@ -278,8 +304,11 @@ public class ObligSBinTre<T> implements Beholder<T> {
         for (int verdi : a) tre.leggInn(verdi);
 
         System.out.println(tre);
-        System.out.println(tre.omvendtString());
+        tre.rot = endreNode(tre.rot);
+        System.out.println(tre);
     }
+
+    static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}
 } // ObligSBinTre
 
 //************************ GJEMMESTED FOR GULL OG TRYLLETRIXX ************************************
