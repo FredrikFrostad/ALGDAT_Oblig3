@@ -92,29 +92,61 @@ public class ObligSBinTre<T> implements Beholder<T> {
     @Override
     public boolean fjern(T verdi) {
 
+        if (rot == null) return false;
+
+        rot = fjernVerdiRekursivt(rot, verdi, this);
+
         return true;
+    }
+
+    private <T> Node<T> fjernVerdiRekursivt(Node<T> node, T verdi, ObligSBinTre<T> tre) {
+
+        Node<T> c = node;
+
+        int cmp = tre.comp.compare(verdi,node.verdi);
+        if (node.venstre != null && cmp < 0)
+            node.venstre = fjernVerdiRekursivt(node.venstre, node.verdi, tre);
+
+        else if (node.høyre != null && cmp > 0)
+            node.høyre = fjernVerdiRekursivt(node.høyre, verdi, tre);
+
+        else {
+
+            if (node.venstre == null) return node.høyre;
+
+            else if (node.høyre == null) return node.venstre;
+
+            Node<T> temp = nesteInorden(node);
+            node.verdi = temp.verdi;
+
+            node.høyre = fjernVerdiRekursivt(node.høyre, node.verdi, tre);
+
+
+        }
+
+        return node;
     }
 
     private void fjernBladnode(Node<T> node) {
         Node<T> forelder = node.forelder;
 
-        if (forelder.venstre.equals(node)) forelder.venstre = null;
-        else forelder.høyre = null;
-
         node.verdi = null;
         node.forelder = null;
         node = null;
 
+        if (forelder.venstre.equals(node)) forelder.venstre = null;
+        else forelder.høyre = null;
+
+
+
     }
 
-    private void fjernNodeEttBarn(Node<T> node, Node<T> barn) {
+    private void fjernNodeEttBarn(Node<T> node) {
 
-        if (node.venstre.equals(barn)) node.venstre = null;
-        else node.høyre = null;
-
-        node.verdi = barn.verdi;
-        barn.forelder = null;
-        barn = null;
+        if (node.venstre != null) {
+            node = node.venstre;
+        }
+        else node = node.høyre;
     }
 
     private void fjernNodeToBarn(Node<T> node) {
@@ -303,8 +335,10 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
 
+        Node<Integer> node = tre.rot;
+
         System.out.println(tre);
-        tre.rot = endreNode(tre.rot);
+        tre.fjern(7);
         System.out.println(tre);
     }
 
