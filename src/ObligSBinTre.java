@@ -345,9 +345,25 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return sb.toString();
     }
 
-    public String høyreGren()
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public String høyreGren() {
+
+        Node<T> node = rot;
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(rot.verdi);
+
+        while (node.venstre != null || node.høyre != null) {
+
+            if (node.høyre != null) {
+                node = node.høyre;
+                sb.append(", ").append(node.verdi);
+            }
+            else {
+                node = node.venstre;
+                sb.append(", ").append(node.verdi);
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public String lengstGren()
@@ -412,11 +428,14 @@ public class ObligSBinTre<T> implements Beholder<T> {
         //int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         //for (int verdi : a) tre.leggInn(verdi);
 //
-        //Node<Integer> node = tre.rot;
+        char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
+        for (char c : verdier) tre.leggInn(c);
 
-        System.out.println();
+
+        //Node<Integer> node = tre.rot;
         //tre.nullstill();
         System.out.println(tre);
+        System.out.println(tre.høyreGren());
         //System.out.println(tre.omvendtString());
     }
 
