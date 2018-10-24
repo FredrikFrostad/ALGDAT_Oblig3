@@ -90,7 +90,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
-    //@Override
+    @Override
     public boolean fjern(T verdi) {
         if (verdi == null) return false;  // treet har ingen nullverdier
 
@@ -150,6 +150,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     }
 
+    //TODO: Prøv å få denne rekursive metoden for fjerning av node til å virke!!
     private <T> Node<T> fjernVerdiRekursivt(Node<T> node, T verdi, ObligSBinTre<T> tre) {
 
         Node<T> p = node;
@@ -179,29 +180,19 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
             else {
                 //TODO: bytt ut denne metoden hvis det ikke virker
-                Node<T> temp = nesteInorden(p.høyre);
+                Node<T> temp = findMinFromRight(node.høyre);
                 p.verdi = temp.verdi;
                 p.høyre = fjernVerdiRekursivt(p.høyre, temp.verdi, tre);
             }
-
         }
-
         return p;
     }
 
-    //TODO: fjern denne hvis den ikke blir brukt
-    private void fjernBladnode(Node<T> node) {
-        Node<T> forelder = node.forelder;
-
-        node.verdi = null;
-        node.forelder = null;
-        node = null;
-
-        if (forelder.venstre.equals(node)) forelder.venstre = null;
-        else forelder.høyre = null;
-
-
-
+    private <T> Node<T> findMinFromRight(Node<T> node) {
+        while(node.venstre != null){
+            node = node.venstre;
+        }
+        return node;
     }
 
     private void fjernNodeEttBarn(Node<T> node) {
