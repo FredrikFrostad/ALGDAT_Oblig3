@@ -216,9 +216,17 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     }
 
-    public int fjernAlle(T verdi)
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public int fjernAlle(T verdi) {
+
+        if (verdi == null) return 0;
+
+        int antallFjernet = 0;
+
+        while (inneholder(verdi)) {
+            fjern(verdi);
+        }
+
+        return antallFjernet;
     }
 
     @Override
@@ -401,7 +409,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         Node<Integer> node = tre.rot;
 
         System.out.println(tre);
-        tre.fjern(1);
+        tre.fjernAlle(4);
         System.out.println(tre);
         System.out.println(tre.omvendtString());
     }
