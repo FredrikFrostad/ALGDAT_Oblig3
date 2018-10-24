@@ -109,7 +109,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
     public int antall(T verdi)
     {
         int antall = 0;
-        java.util.Deque<Node<T>> stack = new java.util.ArrayDeque<>(this.antall);
+        java.util.Deque<Node<T>> stack = new ArrayDeque<>(this.antall);
         stack.addFirst(rot);
 
         while (!stack.isEmpty()) {
@@ -142,35 +142,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
-        Node<T> gjeldende = p, forelder, treff = null;
-        while (gjeldende != null) {
+        Node<T> node = null;
 
-
-
-            //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
-            if (gjeldende.venstre == null) {
-                //Inorder print eller sjekki
-                return gjeldende;
-                //gjeldende = gjeldende.høyre;
-
-            }else
-                {
-                forelder = gjeldende.venstre;
-
-                while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
-
-                if (forelder.høyre == null) {
-                    forelder.høyre = gjeldende;
-                    gjeldende = gjeldende.venstre;
-                }else {
-                    forelder.høyre = null;
-                    //Inorder print eller sjekk
-                    System.out.println(gjeldende.verdi);
-                    return gjeldende;
-                    //gjeldende = gjeldende.høyre;
-                }
-            }
-        }
         return null;
     }
 
