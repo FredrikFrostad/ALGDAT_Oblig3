@@ -142,9 +142,28 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
-        Node<T> node = null;
 
-        return null;
+       if (p.høyre != null) {
+           return minsteverdi(p.høyre);
+       }
+
+       Node<T> q = p.forelder;
+
+       while (q != null && p == q.høyre) {
+           p = q;
+           q = q.forelder;
+       }
+        return q;
+    }
+
+    private static <T> Node<T> minsteverdi(Node<T> node) {
+        Node<T> current = node;
+
+        while (current.venstre != null) {
+            current = current.venstre;
+        }
+
+        return current;
     }
 
     @Override
@@ -237,7 +256,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4,7,2,9,4,10,8,7,4,6,1};
         for (int verdi : a) tre.leggInn(verdi);
 
+        Node<Integer> node = tre.rot;
+        while (node != null) {
+            node = nesteInorden(node);
+            System.out.println(node.verdi);
+        }
         //nesteInorden(tre.rot);
-        System.out.println(tre);
+        //System.out.println(tre);
     }
 } // ObligSBinTre
