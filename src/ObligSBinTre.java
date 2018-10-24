@@ -180,12 +180,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
 
         if (p.høyre != null) {
-            Node<T> current = p.høyre;
+            p = p.høyre;
 
-            while (current.venstre != null) {
-                current = current.venstre;
+            while (p.venstre != null) {
+                p = p.venstre;
             }
-            return current;
+            return p;
         }
 
         Node<T> q = p.forelder;
@@ -203,11 +203,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
     {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        Node<T> node = nesteInorden(rot);
+        Node<T> node = rot;
+
+        while (node.venstre != null) node = node.venstre;
         sb.append(node.verdi);
 
         while (node != null) {
-            node = nesteInorden(node);
+            node = nesteInorden2(node);
             if (node != null) sb.append(",").append(node.verdi);
         }
 
@@ -288,13 +290,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
 
-        //System.out.println(tre);
-        Node<Integer> test = tre.rot;
-        while (test.venstre != null) test = test.venstre;
-        System.out.println(test.verdi);
-        while (test != null) {
-            test = nesteInorden2(test);
-            if (test != null)System.out.println(test.verdi);
-        }
+        System.out.println(tre);
+        //Node<Integer> test = tre.rot;
+        //while (test.venstre != null) test = test.venstre;
+        //System.out.println(test.verdi);
+        //while (test != null) {
+        //    test = nesteInorden2(test);
+        //    if (test != null)System.out.println(test.verdi);
+        //}
     }
 } // ObligSBinTre
