@@ -120,7 +120,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
         {
             Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
             if (p == rot) rot = b;
-            else if (p == q.venstre) q.venstre = b;
+            else if (p == q.venstre)
+
+                q.venstre = b;
+            //Jeg la til denne if setningen og at b.forelder = q;
+            if(q!= null)
+                b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
             else {
                 q.høyre = b;
 
@@ -180,7 +185,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
             else {
                 //TODO: bytt ut denne metoden hvis det ikke virker
-                Node<T> temp = findMinFromRight(node.høyre);
+                Node<T> temp = finnMinsteFraHøyre(node.høyre);
                 p.verdi = temp.verdi;
                 p.høyre = fjernVerdiRekursivt(p.høyre, temp.verdi, tre);
             }
@@ -188,7 +193,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return p;
     }
 
-    private <T> Node<T> findMinFromRight(Node<T> node) {
+    private <T> Node<T> finnMinsteFraHøyre(Node<T> node) {
         while(node.venstre != null){
             node = node.venstre;
         }
@@ -259,16 +264,16 @@ public class ObligSBinTre<T> implements Beholder<T> {
     public void nullstill()
     {
         if (antall < 1) return;
-            rekursivTravers(rot);
+            nullstillRec(rot);
             antall = 0;
             rot = null;
     }
 
-    private void rekursivTravers(Node<T> rot) {
+    private void nullstillRec(Node<T> rot) {
         if (rot.venstre != null)
-            rekursivTravers(rot.venstre);
+            nullstillRec(rot.venstre);
         if (rot.høyre!= null)
-            rekursivTravers(rot.høyre);
+            nullstillRec(rot.høyre);
 
         rot.venstre = null;
         rot.høyre = null;
@@ -279,20 +284,21 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
-
+        //Dersom p har et høyre subtre, ligger neste inorden til venstre i dette subtreet
         if (p.høyre != null) {
             p = p.høyre;
 
+            //Nederste node i venstre subtre er neste innorden
             while (p.venstre != null) {
                 p = p.venstre;
             }
             return p;
         }
 
+        //Vi er nederst i et subtre og må "klatre" opppever i treet
         Node<T> q = p.forelder;
 
-        while (q != null && p == q.høyre) {
-            p = q;
+        while (q != null && p == q.høyre) {            p = q;
             q = q.forelder;
         }
         return q;
@@ -320,13 +326,20 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return sb.toString();
     }
 
-    public String omvendtString()
-    {
+    /**
+     * Motode som skriver ut treets innhold i innorden rekkefølge reversert
+     * Metoden bruker en hjelpestakk for å reversere rekkefølgen til verdiene.
+     * @return en string bestående av treets verdier i omvendt innorden rekkefølge
+     */
+    public String omvendtString() {
+
+        // Sjekker om treet er tomt
         Node<T> node = rot;
         if (node ==null) return "[]";
 
         Deque<T> stack = new ArrayDeque<>();
 
+        //Legger verdier på stakken i innorden rekkefølge
         while (node.venstre != null) node = node.venstre;
         stack.add(node.verdi);
 
@@ -335,6 +348,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
             if (node != null) stack.add(node.verdi);
         }
 
+        //Snur rekkefølgen på verdiene ved å poppe fra toppen av stakken
         StringBuilder sb = new StringBuilder();
         sb.append("[").append(stack.removeLast());
 
@@ -351,12 +365,16 @@ public class ObligSBinTre<T> implements Beholder<T> {
         StringBuilder sb = new StringBuilder();
         sb.append("[").append(rot.verdi);
 
+        //Vi iterere så lenge vi ikke er kommet til en bladnode
         while (node.venstre != null || node.høyre != null) {
 
+            //Går til høyre og legger til verdi dersom det er mulig
             if (node.høyre != null) {
                 node = node.høyre;
                 sb.append(", ").append(node.verdi);
             }
+            //Dersom det ikke finnes noen høyrenode og vi ikke er i en bladnode,
+            //går vi til venstre og legger til verdi
             else {
                 node = node.venstre;
                 sb.append(", ").append(node.verdi);
@@ -366,9 +384,36 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return sb.toString();
     }
 
-    public String lengstGren()
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public String lengstGren() {
+
+        Node<T> node = rot, forrige = null;
+        Deque<Node<T>> stakk = new ArrayDeque<>(antall);
+        ArrayList<Node<T>> nodeliste = new ArrayList<>();
+        ArrayList<Integer> lengde = new ArrayList<>();
+
+        stakk.add(node);
+
+        while (node != null) {
+
+            if (node.venstre != null) {
+                stakk.add(node.venstre);
+                node = node.venstre;
+            }
+            if (node.høyre != null) {
+                stakk.add(node.høyre);
+                node = node.høyre;
+            }
+
+            if (node.venstre == null && node.høyre == null) {
+                stakk.toArray();
+
+                while (node.høyre == null && forrige != node.høyre) {
+                    node = node.forelder;
+                }
+                node = node.høyre;
+            }
+        }
+        return null;
     }
 
     public String[] grener()
@@ -378,7 +423,20 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public String bladnodeverdier()
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+        return bladnodeStr(rot, new StringJoiner(", ", "[", "]")).toString();
+    }
+
+    private StringJoiner bladnodeStr(Node<T> node, StringJoiner sj) {
+
+        if (node.venstre != null) bladnodeStr(node.venstre, sj);
+        if (node.høyre != null) bladnodeStr(node.høyre, sj);
+
+        if (node.venstre == null && node.høyre == null) {
+            sj.add(node.verdi.toString());
+        }
+
+        return sj;
     }
 
     public String postString()
@@ -425,17 +483,19 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public static void main(String[] args) {
         ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
-        //int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
-        //for (int verdi : a) tre.leggInn(verdi);
+        int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
+        for (int verdi : a) tre.leggInn(verdi);
 //
-        char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
-        for (char c : verdier) tre.leggInn(c);
+        //char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
+        //for (char c : verdier) tre.leggInn(c);
 
 
         //Node<Integer> node = tre.rot;
         //tre.nullstill();
-        System.out.println(tre);
-        System.out.println(tre.høyreGren());
+        //System.out.println(tre);
+        System.out.println(tre.bladnodeverdier());
+        //System.out.println(tre);
+        //System.out.println(tre.høyreGren());
         //System.out.println(tre.omvendtString());
     }
 
