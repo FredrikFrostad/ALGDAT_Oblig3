@@ -124,8 +124,9 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
                 q.venstre = b;
             //Jeg la til denne if setningen og at b.forelder = q;
-            if(q!= null)
-                b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
+                    //TODO: finn ut av hvorfor det kastes en nullpointerexception av de to linjene under
+//            if(q!= null)
+//                b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
             else {
                 q.høyre = b;
 
@@ -416,14 +417,48 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return null;
     }
 
-    public String[] grener()
-    {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public String[] grener() {
+
+        if (rot ==null) return new String[0];
+
+        ArrayList<Deque<T>> dqLst = new ArrayList<>();
+
+        grenRek(dqLst, rot);
+
+        String[] out = new String[dqLst.size()];
+        int i = 0;
+        for (Deque<T> element: dqLst) {
+            out[i++] = element.toString();
+        }
+
+
+        return out;
+    }
+
+    private static <T> void grenRek(ArrayList<Deque<T>> dqLst, Node<T> node) {
+
+        if (node.venstre != null) {
+            grenRek(dqLst, node.venstre);
+            //node = node.venstre;
+        }
+        if (node.høyre != null) {
+            grenRek(dqLst, node.høyre);
+            //node = node.høyre;
+        }
+        Deque<T> stakk = new ArrayDeque<>();
+
+        if (node.venstre == null && node.høyre == null) {
+            while (node != null) {
+                stakk.addFirst(node.verdi);
+                node = node.forelder;
+            }
+            dqLst.add(stakk);
+        }
     }
 
     public String bladnodeverdier()
     {
-
+        if (rot == null) return "[]";
         return bladnodeStr(rot, new StringJoiner(", ", "[", "]")).toString();
     }
 
@@ -441,7 +476,21 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public String postString()
     {
-        throw new UnsupportedOperationException("Ikke kodet ennå!");
+        StringJoiner sj = new StringJoiner(",","[","]");
+        Node<T> node = rot;
+
+        Deque<Node<T>> stakk = new ArrayDeque<>();
+        stakk.add(rot);
+
+
+        if (node.venstre != null) {
+            stakk.addFirst(node);
+            node = node.venstre;
+        }
+        if (node.høyre !=)
+
+
+        return null;
     }
 
 
