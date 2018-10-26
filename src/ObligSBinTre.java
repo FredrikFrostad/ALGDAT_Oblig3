@@ -125,6 +125,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
                 q.venstre = b;
             //Jeg la til denne if setningen og at b.forelder = q;
                     //TODO: finn ut av hvorfor det kastes en nullpointerexception av de to linjene under
+                    // TODO: aka: ALT ER DRITT!!
 //            if(q!= null)
 //                b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
             else {
@@ -473,26 +474,54 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
         return sj;
     }
+/*
+    public String postString() {
 
-    public String postString()
-    {
+        if (rot == null) return "[]";
+
         StringJoiner sj = new StringJoiner(",","[","]");
-        Node<T> node = rot;
-
         Deque<Node<T>> stakk = new ArrayDeque<>();
-        stakk.add(rot);
+        Node<T> node, forrige;
 
+        node = rot;
 
-        if (node.venstre != null) {
-            stakk.addFirst(node);
-            node = node.venstre;
+        while (node != null || !stakk.isEmpty()) {
+            while (node.venstre != null || node.høyre != null) {
+                stakk.add(node);
+                node = node.venstre;
+            }
         }
-        if (node.høyre !=)
-
-
         return null;
     }
+*/
 
+
+    public String postString() {
+        Stack<Node<T>> s = new Stack();
+        List<String> ans = new ArrayList<>();
+        Node<T> cur = rot;
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+
+        while (cur != null || !s.empty()) {
+            while (cur != null && (cur.venstre != null || cur.høyre != null) ) {
+                s.push(cur);
+                cur = cur.venstre;
+            }
+
+            if (cur != null) sj.add(cur.verdi.toString());
+                //ans.add(cur.verdi.toString());
+
+            while (!s.empty() && cur == s.peek().høyre) {
+                cur = s.pop();
+                sj.add(cur.verdi.toString());
+                //ans.add(cur.verdi.toString());
+            }
+
+            if (s.empty()) cur = null; else cur = s.peek().høyre;
+        }
+
+        return sj.toString();
+    }
 
     @Override
     public Iterator<T> iterator()
@@ -534,18 +563,20 @@ public class ObligSBinTre<T> implements Beholder<T> {
         ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
-//
-        //char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
-        //for (char c : verdier) tre.leggInn(c);
 
+        Deque<Integer> test = new ArrayDeque<>();
+        test.addFirst(1);
+        test.addFirst(2);
+        test.addFirst(3);
+        test.addFirst(4);
+        test.addFirst(5);
+        test.addFirst(6);
 
-        //Node<Integer> node = tre.rot;
-        //tre.nullstill();
-        //System.out.println(tre);
-        System.out.println(tre.bladnodeverdier());
-        //System.out.println(tre);
-        //System.out.println(tre.høyreGren());
-        //System.out.println(tre.omvendtString());
+       // while (!test.isEmpty()) {
+       //     System.out.println(test.remove());
+       // }
+
+        //System.out.println(tre.postorderTraversal(tre.rot));
     }
 
     static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}
