@@ -202,17 +202,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return node;
     }
 
-    private void fjernNodeEttBarn(Node<T> node) {
-
-        if (node.venstre != null) {
-            node = node.venstre;
-        }
-        else node = node.høyre;
-    }
-
-    private void fjernNodeToBarn(Node<T> node) {
-
-    }
 
     public int fjernAlle(T verdi) {
 
@@ -363,6 +352,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public String høyreGren() {
 
+        if (rot == null) return "[]";
+
         Node<T> node = rot;
         StringBuilder sb = new StringBuilder();
         sb.append("[").append(rot.verdi);
@@ -388,35 +379,61 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     public String lengstGren() {
 
-        Node<T> node = rot, forrige = null;
-        Deque<Node<T>> stakk = new ArrayDeque<>(antall);
-        ArrayList<Node<T>> nodeliste = new ArrayList<>();
-        ArrayList<Integer> lengde = new ArrayList<>();
+        if (rot == null) return "[]";
 
-        stakk.add(node);
+        ArrayList<Node<T>> bladnoder = this.finnBladnoder();
+        ArrayList<Deque<Node<T>>> grener = new ArrayList<>();
+        Node<T> node;
 
-        while (node != null) {
+        for (int i = 0; i < bladnoder.size(); i++) {
 
-            if (node.venstre != null) {
-                stakk.add(node.venstre);
-                node = node.venstre;
+            Deque<Node<T>> stakk = new ArrayDeque<>();
+            node = bladnoder.get(i);
+
+            while (node != null) {
+                stakk.add(node);
+                node = node.forelder;
             }
-            if (node.høyre != null) {
-                stakk.add(node.høyre);
-                node = node.høyre;
-            }
+            grener.add(stakk);
 
-            if (node.venstre == null && node.høyre == null) {
-                stakk.toArray();
+        }
+        int indeks = -1, lengde, antallnoder = -1;
 
-                while (node.høyre == null && forrige != node.høyre) {
-                    node = node.forelder;
-                }
-                node = node.høyre;
+        for (int i = 0; i < grener.size(); i++) {
+
+            lengde = grener.get(i).size();
+
+            if (lengde > antallnoder) {
+                antallnoder = lengde;
+                indeks = i;
             }
         }
-        return null;
+        Deque<Node<T>> stakk = grener.get(indeks);
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+
+        while (!stakk.isEmpty()) {
+            sj.add(stakk.removeLast().verdi.toString());
+        }
+
+        return indeks >= 0 ? sj.toString() : "[]";
     }
+
+    private ArrayList<Node<T>> finnBladnoder() {
+
+        return bladnoderRec(rot, new ArrayList<Node<T>>());
+    }
+
+    private static <T> ArrayList<Node<T>> bladnoderRec(Node<T> node, ArrayList<Node<T>> nodeListe) {
+
+        if (node.venstre != null) bladnoderRec(node.venstre, nodeListe);
+        if (node.høyre != null) bladnoderRec(node.høyre, nodeListe);
+
+        if (node.venstre == null && node.høyre == null) {
+            nodeListe.add(node);
+        }
+        return nodeListe;
+    }
+
 
     public String[] grener() {
 
@@ -457,6 +474,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         }
     }
 
+
     public String bladnodeverdier()
     {
         if (rot == null) return "[]";
@@ -474,50 +492,27 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
         return sj;
     }
-/*
-    public String postString() {
-
-        if (rot == null) return "[]";
-
-        StringJoiner sj = new StringJoiner(",","[","]");
-        Deque<Node<T>> stakk = new ArrayDeque<>();
-        Node<T> node, forrige;
-
-        node = rot;
-
-        while (node != null || !stakk.isEmpty()) {
-            while (node.venstre != null || node.høyre != null) {
-                stakk.add(node);
-                node = node.venstre;
-            }
-        }
-        return null;
-    }
-*/
 
 
     public String postString() {
-        Stack<Node<T>> s = new Stack();
-        List<String> ans = new ArrayList<>();
-        Node<T> cur = rot;
+        Stack<Node<T>> stakk = new Stack();
+        Node<T> node = rot;
         StringJoiner sj = new StringJoiner(", ", "[", "]");
 
-        while (cur != null || !s.empty()) {
-            while (cur != null && (cur.venstre != null || cur.høyre != null) ) {
-                s.push(cur);
-                cur = cur.venstre;
+        while (node != null || !stakk.empty()) {
+            while (node != null && (node.venstre != null || node.høyre != null) ) {
+                stakk.push(node);
+                node = node.venstre;
             }
 
-            if (cur != null) sj.add(cur.verdi.toString());
-                //ans.add(cur.verdi.toString());
+            if (node != null) sj.add(node.verdi.toString());
 
-            while (!s.empty() && cur == s.peek().høyre) {
-                cur = s.pop();
-                sj.add(cur.verdi.toString());
-                //ans.add(cur.verdi.toString());
+            while (!stakk.empty() && node == stakk.peek().høyre) {
+                node = stakk.pop();
+                sj.add(node.verdi.toString());
             }
 
-            if (s.empty()) cur = null; else cur = s.peek().høyre;
+            if (stakk.empty()) node = null; else node = stakk.peek().høyre;
         }
 
         return sj.toString();
@@ -564,13 +559,17 @@ public class ObligSBinTre<T> implements Beholder<T> {
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
 
-        Deque<Integer> test = new ArrayDeque<>();
-        test.addFirst(1);
-        test.addFirst(2);
-        test.addFirst(3);
-        test.addFirst(4);
-        test.addFirst(5);
-        test.addFirst(6);
+        ArrayList<Node<Integer>> liste = tre.finnBladnoder();
+        for (Node<Integer> element : liste) System.out.println(element.verdi.toString());
+        System.out.println(tre.lengstGren());
+
+        //Deque<Integer> test = new ArrayDeque<>();
+        //test.addFirst(1);
+        //test.addFirst(2);
+        //test.addFirst(3);
+        //test.addFirst(4);
+        //test.addFirst(5);
+        //test.addFirst(6);
 
        // while (!test.isEmpty()) {
        //     System.out.println(test.remove());
@@ -616,6 +615,46 @@ public class ObligSBinTre<T> implements Beholder<T> {
                 }
             }
         }
+        return null;
+    }
+*/
+
+/*
+    public String lengstGren() {
+
+        if (rot == null) return "[]";
+
+        Node<T> node = rot, forrige = null;
+        Deque<Node<T>> stakk = new ArrayDeque<>(antall);
+        ArrayList<Node<T>> nodeliste = new ArrayList<>();
+        ArrayList<Integer> lengde = new ArrayList<>();
+
+        stakk.add(node);
+
+        while (node != null) {
+
+            if (node.venstre != null) {
+                stakk.add(node.venstre);
+                node = node.venstre;
+            }
+            if (node.høyre != null) {
+                stakk.add(node.høyre);
+                node = node.høyre;
+            }
+
+            if (node.venstre == null && node.høyre == null) {
+                stakk.toArray();
+
+                while (node.høyre == null && forrige != node.høyre) {
+                    node = node.forelder;
+                }
+                node = node.høyre;
+            }
+        }
+
+        int index = 0;
+
+
         return null;
     }
 */
