@@ -94,42 +94,43 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     @Override
     public boolean fjern(T verdi) {
-        if (verdi == null) return false;  // treet har ingen nullverdier
+        if (verdi == null) return false;    // treet har ingen nullverdier
 
-        Node<T> p = rot, q = null;   // q skal være forelder til p
+        Node<T> p = rot, q = null;          // q skal være forelder til p
 
-        while (p != null)            // leter etter verdi
-        {
+        while (p != null) {                 // leter etter verdi
             int cmp = comp.compare(verdi,p.verdi);      // sammenligner
             if (cmp < 0) {
-                q = p;                  // setter forelder
-                p = p.venstre; }        // går til venstre
+                q = p;                      // setter forelder
+                p = p.venstre; }            // går til venstre
             else if (cmp > 0) {
-                q = p;                  // setter forelder
-                p = p.høyre; }          // går til høyre
-            else break;                 // vi har funnet en node p == parameterverdien
+                q = p;                      // setter forelder
+                p = p.høyre; }              // går til høyre
+            else break;                     // vi har funnet en node p == parameterverdien
         }
-        if (p == null) return false;    // Parameterverdien finnes ikke i treet
 
-        // Dersom p er en bladnode nuller vi pekeren til p
-        if(p.venstre == null && p.høyre == null && q != null) {
+        if (p == null) return false;        // Parameterverdien finnes ikke i treet
+
+
+        if(p.venstre == null                // Tilfelle 1: Dersom p er en bladnode nuller vi pekeren til p
+                && p.høyre == null
+                    && q != null) {
 
             if(q.høyre == p) q.høyre = null;
             else q.venstre = null;
 
         }
-        // Dersom p har ett barn må vi oppdatere pekeren slik at vi "hopper over" p
-        else if (p.venstre == null || p.høyre == null) {
+        else if (p.venstre == null || p.høyre == null) {                //Tilfelle 2: p har ett barn
 
-            Node<T> child = p.venstre != null ? p.venstre : p.høyre;  // Finner child noden til p
+            Node<T> child = p.venstre != null ? p.venstre : p.høyre;    // Finner child noden til p
 
-            //Setter peker TIL p FRA forelder til å peke på child
-            if (p == rot) rot = child;
+            if (p == rot) rot = child;      //Oppdaterer pekere og forbereder p for garbagecollection
             else if (p == q.venstre) q.venstre = child;
             else {
                 q.høyre = child;
                 child.forelder = q;
                 p = null;
+
             }
         }
         // Dersom p har to barn må vi finne neste innorden og erstatte p med denne
@@ -152,6 +153,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return true;
 
     }
+
 
     private <T> Node<T> finnMinsteFraHøyre(Node<T> node) {
         while(node.venstre != null){
