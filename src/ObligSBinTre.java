@@ -40,6 +40,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         rot = null;
         antall = 0;
         comp = c;
+        endringer = 0;
     }
 
     @Override
@@ -66,7 +67,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
         if (forelder == null) rot = node;             // treet er tomt. Node blir rot.
         else if (c < 0) forelder.venstre = node;      // node blir venstre barn
         else forelder.høyre = node;                   // node blir høyre barn
-        antall++;                                   //øker antall med 1;
+        antall++; //øker antall med 1;
+        endringer++;
 
         return true;
     }
@@ -153,6 +155,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         }
 
         antall--;   // det er nå én node mindre i treet
+        endringer++;
         return true;
 
     }
@@ -213,7 +216,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
             fjern(verdi);
             antallFjernet++;
         }
-
+        antall = 0;
+        endringer++;
         return antallFjernet;
     }
 
@@ -257,6 +261,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         if (antall < 1) return;
             nullstillRec(rot);
             antall = 0;
+            endringer++;
             rot = null;
     }
 
@@ -532,7 +537,18 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
         private BladnodeIterator() // konstruktør
         {
-            throw new UnsupportedOperationException("Ikke kodet ennå!");
+            if (p != null) this.p = firstLeaf(this.p);
+        }
+
+        /**
+         * Hjelpemetode som finner første bladnode i treet. Dersom treet
+         * er tomt returneres parameternoden.
+         * @param p rot noden i treet vi ser på
+         * @return den første bladnoden i treet
+         */
+        private Node<T> firstLeaf(Node<T> p) {
+
+            return finnBladnoder().get(0);
         }
 
         @Override
@@ -544,7 +560,55 @@ public class ObligSBinTre<T> implements Beholder<T> {
         @Override
         public T next()
         {
-            throw new UnsupportedOperationException("Ikke kodet ennå!");
+            if (iteratorendringer != endringer) {
+                throw new ConcurrentModificationException
+                        ("listen er endret!");
+            }
+            if (!hasNext()) throw new NoSuchElementException
+                    ("det er ikke flere elementer i listen!");
+
+            Node<T> nesteKandidat = nesteInorden(p);
+
+            while (nesteKandidat != null &&
+                    (nesteKandidat.venstre != null || nesteKandidat.høyre != null)) {
+                nesteKandidat = nesteInorden(nesteKandidat);
+            }
+                removeOK = true;
+                T out = p.verdi;
+                p = nesteKandidat;
+                return out;
+        }
+
+        private Node<T> nesteBladnode(Node<T> p)  {
+
+            Node<T> gjeldende = p, forelder, treff = null;
+
+            while (gjeldende.forelder != null) gjeldende = gjeldende.forelder;
+            while (gjeldende != null) {
+
+                //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
+                if (gjeldende.venstre == null) {
+                    System.out.println(gjeldende.verdi);
+                    gjeldende = gjeldende.høyre;
+
+                }else
+                {
+                    forelder = gjeldende.venstre;
+
+                    while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
+
+                    if (forelder.høyre == null) {
+                        forelder.høyre = gjeldende;
+                        gjeldende = gjeldende.venstre;
+                    }else {
+                        forelder.høyre = null;
+                        //Inorder print eller sjekk
+                        System.out.println(gjeldende.verdi);
+                        gjeldende = gjeldende.høyre;
+                    }
+                }
+            }
+            return null;
         }
 
         @Override
@@ -554,28 +618,26 @@ public class ObligSBinTre<T> implements Beholder<T> {
         }
     } // BladnodeIterator
 
+
+    public Node<T> firstLeaf(Node<T> p, Node<T> q) {
+
+        Node<T> node = p;
+
+        if (node.venstre != null) firstLeaf(node.venstre, node);
+        if (node.høyre != null) firstLeaf(node.høyre, node);
+
+        if (node.venstre == null && node.høyre == null && !node.equals(q)) return p = node;
+
+        return p;
+    }
+
     public static void main(String[] args) {
         ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
 
-        ArrayList<Node<Integer>> liste = tre.finnBladnoder();
-        for (Node<Integer> element : liste) System.out.println(element.verdi.toString());
-        System.out.println(tre.lengstGren());
-
-        //Deque<Integer> test = new ArrayDeque<>();
-        //test.addFirst(1);
-        //test.addFirst(2);
-        //test.addFirst(3);
-        //test.addFirst(4);
-        //test.addFirst(5);
-        //test.addFirst(6);
-
-       // while (!test.isEmpty()) {
-       //     System.out.println(test.remove());
-       // }
-
-        //System.out.println(tre.postorderTraversal(tre.rot));
+        Node<Integer> node = tre.firstLeaf(tre.rot, null);
+        System.out.println(node.verdi);
     }
 
     static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}
@@ -585,7 +647,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
 /*
 
-    private static <T> Node<T> nesteInorden(Node<T> p)  {
+    private static <T> Node<T> nesteBladnode(Node<T> p)  {
 
         Node<T> gjeldende = p, forelder, treff = null;
 
