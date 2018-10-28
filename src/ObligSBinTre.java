@@ -155,14 +155,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
-    private <T> Node<T> finnMinsteFraHøyre(Node<T> node) {
-        while(node.venstre != null){
-            node = node.venstre;
-        }
-        return node;
-    }
-
-
     public int fjernAlle(T verdi) {
 
         if (verdi == null || rot == null) return 0;
