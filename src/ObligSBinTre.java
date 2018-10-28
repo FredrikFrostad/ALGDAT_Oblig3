@@ -153,44 +153,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     }
 
-    //TODO: Prøv å få denne rekursive metoden for fjerning av node til å virke!!
-    private <T> Node<T> fjernVerdiRekursivt(Node<T> node, T verdi, ObligSBinTre<T> tre) {
-
-        Node<T> p = node;
-
-        int cmp = tre.comp.compare(p.verdi, verdi);
-        if (cmp > 0) {
-            p.venstre = fjernVerdiRekursivt(p.venstre, verdi, tre);
-        }
-
-        else if (cmp < 0) {
-            p.høyre = fjernVerdiRekursivt(p.høyre, verdi, tre);
-        }
-
-        else {
-
-            if (p.venstre == null && p.høyre == null) {
-                p = null;
-            }
-
-            else if (p.høyre == null) {
-                p = p.venstre;
-            }
-
-            else if (p.venstre == null) {
-                p = p.høyre;
-            }
-
-            else {
-                //TODO: bytt ut denne metoden hvis det ikke virker
-                Node<T> temp = finnMinsteFraHøyre(node.høyre);
-                p.verdi = temp.verdi;
-                p.høyre = fjernVerdiRekursivt(p.høyre, temp.verdi, tre);
-            }
-        }
-        return p;
-    }
-
     private <T> Node<T> finnMinsteFraHøyre(Node<T> node) {
         while(node.venstre != null){
             node = node.venstre;
