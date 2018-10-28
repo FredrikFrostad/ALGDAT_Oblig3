@@ -101,49 +101,42 @@ public class ObligSBinTre<T> implements Beholder<T> {
         while (p != null)            // leter etter verdi
         {
             int cmp = comp.compare(verdi,p.verdi);      // sammenligner
-            if (cmp < 0) { q = p; p = p.venstre; }      // går til venstre
-            else if (cmp > 0) { q = p; p = p.høyre; }   // går til høyre
-            else break;    // den søkte verdien ligger i p. verdi == p.verdi.
+            if (cmp < 0) {
+                q = p;                  // setter forelder
+                p = p.venstre; }        // går til venstre
+            else if (cmp > 0) {
+                q = p;                  // setter forelder
+                p = p.høyre; }          // går til høyre
+            else break;                 // vi har funnet en node p == parameterverdien
         }
-        if (p == null) return false;   // finner ikke verdi
+        if (p == null) return false;    // Parameterverdien finnes ikke i treet
 
-        //Jeg la til dette
-        if(p.venstre == null && p.høyre == null && q!=null){
+        // Dersom p er en bladnode nuller vi pekeren til p
+        if(p.venstre == null && p.høyre == null && q != null) {
 
-            //Kan denne koden optimaliseres?
-            if(q.høyre==p){
-                q.høyre=null;
-            }else{
-                q.venstre = null;
-            }
+            if(q.høyre == p) q.høyre = null;
+            else q.venstre = null;
+
         }
-        //Jeg flyttet denne til en else if. Måtte håndtere om p.venstre == null og p.høyre==null
-        else if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
-        {
-            Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
-            if (p == rot) rot = b;
-            else if (p == q.venstre)
+        // Dersom p har ett barn må vi oppdatere pekeren slik at vi "hopper over" p
+        else if (p.venstre == null || p.høyre == null) {
 
-                q.venstre = b;
-            //Jeg la til denne if setningen og at b.forelder = q;
-                    //TODO: finn ut av hvorfor det kastes en nullpointerexception av de to linjene under
-                    // TODO: aka: ALT ER DRITT!!
-//            if(q!= null)
-//                b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
+            Node<T> child = p.venstre != null ? p.venstre : p.høyre;  // Finner child noden til p
+
+            //Setter peker TIL p FRA forelder til å peke på child
+            if (p == rot) rot = child;
+            else if (p == q.venstre) q.venstre = child;
             else {
-                q.høyre = b;
-
-                //Jeg la til denne if setningen og at b.forelder = q;
-                if(q!= null)
-                    b.forelder = q; //Linje lagt til for å kunne oppdatere forelder hvis man fjærner siste i in-orden
+                q.høyre = child;
+                child.forelder = q;
+                p = null;
             }
         }
-        else  // Tilfelle 3)
-        {
+        // Dersom p har to barn må vi finne neste innorden og erstatte p med denne
+        else {
             Node<T> s = p, r = p.høyre;   // finner neste i inorden
 
-            while (r.venstre != null)
-            {
+            while (r.venstre != null) {
                 s = r;    // s er forelder til r
                 r = r.venstre;
             }
@@ -154,7 +147,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
             else s.høyre = r.høyre;
         }
 
-        antall--;   // det er nå én node mindre i treet
+        antall--;
         endringer++;
         return true;
 
@@ -579,37 +572,6 @@ public class ObligSBinTre<T> implements Beholder<T> {
                 return out;
         }
 
-        private Node<T> nesteBladnode(Node<T> p)  {
-
-            Node<T> gjeldende = p, forelder, treff = null;
-
-            while (gjeldende.forelder != null) gjeldende = gjeldende.forelder;
-            while (gjeldende != null) {
-
-                //Navigerer helt til høyre i gjeldende nodes venstre subtre og setter høyrepeker til gjeldende
-                if (gjeldende.venstre == null) {
-                    System.out.println(gjeldende.verdi);
-                    gjeldende = gjeldende.høyre;
-
-                }else
-                {
-                    forelder = gjeldende.venstre;
-
-                    while (forelder.høyre != null && forelder.høyre != gjeldende) forelder = forelder.høyre;
-
-                    if (forelder.høyre == null) {
-                        forelder.høyre = gjeldende;
-                        gjeldende = gjeldende.venstre;
-                    }else {
-                        forelder.høyre = null;
-                        //Inorder print eller sjekk
-                        System.out.println(gjeldende.verdi);
-                        gjeldende = gjeldende.høyre;
-                    }
-                }
-            }
-            return null;
-        }
 
         @Override
         public void remove()
