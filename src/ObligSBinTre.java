@@ -43,6 +43,11 @@ public class ObligSBinTre<T> implements Beholder<T> {
         endringer = 0;
     }
 
+    /**
+     * Metode som legger inn en ny verdi (node) i treet.
+     * @param verdi Verdien som skal legges inn i treet, kan ikke være null
+     * @return true dersom noden er lagt inn, false ellers
+     */
     @Override
     public boolean leggInn(T verdi)
     {
@@ -296,7 +301,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
 
     /**
-     * Metode som returnerer en strengrepresentasjon av treet
+     * Metode som returnerer en strengrepresentasjon av treet, metoden bruker nesteInorden som hjelpemetode
      * @return en streng med treets innhold
      */
     @Override
@@ -380,16 +385,21 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return sb.toString();
     }
 
+    /**
+     * Metode som finner den lengste grenen i et tre.
+     * Dersom flere grener har samme lengde, velges grenen lengst til venstre
+     * @return en string med verdiene i den lengste grenen
+     */
     public String lengstGren() {
 
-        if (rot == null) return "[]";
+        if (rot == null) return "[]";                           //sjekker om treet er tomt
 
-        ArrayList<Node<T>> bladnoder = this.finnBladnoder();
-        ArrayList<Deque<Node<T>>> grener = new ArrayList<>();
+        ArrayList<Node<T>> bladnoder = finnBladnoder();         // finner alle bladnodene
+        ArrayList<Deque<Node<T>>> grener = new ArrayList<>();   //Lager et array for å lagre alle grenene som stakker
         Node<T> node;
 
-        for (int i = 0; i < bladnoder.size(); i++) {
-
+        for (int i = 0; i < bladnoder.size(); i++) {            // For hver bladnode itererer vi opp til roten
+                                                                // og bygger opp en stakk med grenens noder underveis
             Deque<Node<T>> stakk = new ArrayDeque<>();
             node = bladnoder.get(i);
 
@@ -400,10 +410,11 @@ public class ObligSBinTre<T> implements Beholder<T> {
             grener.add(stakk);
 
         }
-        int indeks = -1, lengde, antallnoder = -1;
 
-        for (int i = 0; i < grener.size(); i++) {
+        int indeks = 0, lengde, antallnoder = -1;
 
+        for (int i = 0; i < grener.size(); i++) {               // Sjekker hvilken gren som er lengst og lagrer indeks
+                                                                // til stakken som inneholder den lengste grenen
             lengde = grener.get(i).size();
 
             if (lengde > antallnoder) {
@@ -414,18 +425,30 @@ public class ObligSBinTre<T> implements Beholder<T> {
         Deque<Node<T>> stakk = grener.get(indeks);
         StringJoiner sj = new StringJoiner(", ", "[", "]");
 
-        while (!stakk.isEmpty()) {
-            sj.add(stakk.removeLast().verdi.toString());
+        while (!stakk.isEmpty()) {                              // Bygger opp en streng bestående av verdiene til
+            sj.add(stakk.removeLast().verdi.toString());        // den lengste grenen.
         }
 
         return indeks >= 0 ? sj.toString() : "[]";
     }
 
+
+    /**
+     * Metode som finner alle bladnodene i et tre
+     * @return en ArrayList inneholdende alle bladnodene
+     */
     private ArrayList<Node<T>> finnBladnoder() {
 
         return bladnoderRec(rot, new ArrayList<Node<T>>());
     }
 
+    /**
+     * Rekursiv hjelpemetode for å finne bladnoder
+     * @param node rotnoden i treet
+     * @param nodeListe Arraylist som skal holde på bladnodene vi finner
+     * @param <T> Generist typedefinisjon
+     * @return Arraylist med bladnoder
+     */
     private static <T> ArrayList<Node<T>> bladnoderRec(Node<T> node, ArrayList<Node<T>> nodeListe) {
 
         if (node.venstre != null) bladnoderRec(node.venstre, nodeListe);
@@ -437,59 +460,75 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return nodeListe;
     }
 
-
+    /**
+     * Metode som finner alle grenene i et tre
+     * @return et stringarray med verdiene i hver gren. Grenene er ordnet fra venstre til høyre
+     */
     public String[] grener() {
 
-        if (rot ==null) return new String[0];
+        if (rot ==null) return new String[0];           //Sjekker om treet er tomt
 
-        ArrayList<Deque<T>> dqLst = new ArrayList<>();
+        ArrayList<Deque<T>> dqLst = new ArrayList<>();  // Arraylist som skal holde nodene i de forskjellige grenene
 
-        grenRek(dqLst, rot);
-
+        grenRek(dqLst, rot);                            // Kaller på rekursiv hjelpemetode som legger hver gren
+                                                        // i en egen stack
         String[] out = new String[dqLst.size()];
         int i = 0;
-        for (Deque<T> element: dqLst) {
-            out[i++] = element.toString();
+        for (Deque<T> element: dqLst) {                 // Itererer over listen med grenstakker og
+            out[i++] = element.toString();              // kaller tostring for hver gren
         }
-
-
         return out;
     }
 
+    /**
+     * Rekursiv hjelpemetode for å finne alle grener i et tre
+     * @param dqLst En Arraylist av type Deque som skal holde "grenstakkene"
+     * @param node rotnoden i treet
+     * @param <T> generisk typedefinisjon
+     */
     private static <T> void grenRek(ArrayList<Deque<T>> dqLst, Node<T> node) {
 
-        if (node.venstre != null) {
+        if (node.venstre != null) {             //Rekurserer nedover i treet
             grenRek(dqLst, node.venstre);
-            //node = node.venstre;
         }
-        if (node.høyre != null) {
+        if (node.høyre != null) {               //Rekurserer nedover i treet
             grenRek(dqLst, node.høyre);
-            //node = node.høyre;
         }
-        Deque<T> stakk = new ArrayDeque<>();
+        Deque<T> stakk = new ArrayDeque<>();    //Stakk som skal holde alle nodene i grenen
 
-        if (node.venstre == null && node.høyre == null) {
-            while (node != null) {
+        if (node.venstre == null && node.høyre == null) {   //Traverserer fra grenens bladnode til rotnode og
+            while (node != null) {                          // legger alle noder som passeres på stakken
                 stakk.addFirst(node.verdi);
                 node = node.forelder;
             }
-            dqLst.add(stakk);
-        }
+            dqLst.add(stakk);                               // Legger grenstakken til arraylisten som er sendt med
+        }                                                   // parameter
     }
 
 
+    /**
+     * Metode som returnerer en string med alle baldnodeverdiene i treet.
+     * Bruker en rekursiv hjelpemetode: bladnodeStr()
+     * @return En string med alle bladnodeverdiene
+     */
     public String bladnodeverdier()
     {
-        if (rot == null) return "[]";
+        if (rot == null) return "[]";   // Sjekker om treet er tomt
         return bladnodeStr(rot, new StringJoiner(", ", "[", "]")).toString();
     }
 
+    /**
+     * Rekursiv hjelpemetode som for å finne verdien til alle bladnodene i et tre
+     * @param node Gjeldende node (rot i forste kall)
+     * @param sj stringjoiner-object som bygger opp stringen med nodeverdier
+     * @return det ferdige stringjoiner objektet
+     */
     private StringJoiner bladnodeStr(Node<T> node, StringJoiner sj) {
 
-        if (node.venstre != null) bladnodeStr(node.venstre, sj);
-        if (node.høyre != null) bladnodeStr(node.høyre, sj);
+        if (node.venstre != null) bladnodeStr(node.venstre, sj);    // Rekurserer til venstre
+        if (node.høyre != null) bladnodeStr(node.høyre, sj);        // Rekurserer til høyre
 
-        if (node.venstre == null && node.høyre == null) {
+        if (node.venstre == null && node.høyre == null) {           // Dersom bladnode, legg til verdi
             sj.add(node.verdi.toString());
         }
 
@@ -598,7 +637,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
             }else {
                 rot = null;
                 q.verdi = null;
-                q = null;
+                q
+                        = null;
             }
             endringer++;
             iteratorendringer++;
