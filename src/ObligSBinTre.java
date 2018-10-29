@@ -73,6 +73,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return true;
     }
 
+
+    /**
+     * Metode som sjekker om en verdi finnes i treet.
+     * @param verdi verdien vi ønsker å finne i treet
+     * @return true dersom verdien finnes, false ellers
+     */
     @Override
     public boolean inneholder(T verdi)
     {
@@ -91,7 +97,11 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return false;
     }
 
-
+    /**
+     * Metode som fjerner første forkomst av en verdi dersom den finnes i treet
+     * @param verdi Verdien som skal fjernes
+     * @return true dersom verdien er i treet og blir fjernet, false ellers
+     */
     @Override
     public boolean fjern(T verdi) {
         if (verdi == null) return false;    // treet har ingen nullverdier
@@ -154,34 +164,49 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
     }
 
-
+    /**
+     * Metode som fjerner alle forekomster av en verdi i treet
+     * @param verdi verdien som skal fjernes
+     * @return antall forekamster av den fjernede verdien i treet
+     */
     public int fjernAlle(T verdi) {
 
-        if (verdi == null || rot == null) return 0;
+        if (verdi == null || rot == null) return 0;     //Dersoom tomt tre eller nullverdi som parameter
 
         int antallFjernet = 0;
 
-        while (inneholder(verdi)) {
-            fjern(verdi);
+        while (inneholder(verdi)) {                     // Så lenge parameterverdien finnes i treet kaller vi
+            fjern(verdi);                               // fjern-metoden, og oppdaterer antallFjernet
             antallFjernet++;
         }
-        antall = 0;
-        endringer++;
+        antall = 0;                                     // Oppdaterer antall
+        endringer++;                                    // Oppdaterer endringer
         return antallFjernet;
     }
 
+    /**
+     * Metode som returnerer antall noder i treet
+     * @return
+     */
     @Override
     public int antall()
     {
         return antall;
     }
 
+    /**
+     * Metode som reurnerer antall forekomster av en gitt verdi i treet
+     * @param verdi verdien vi vil finne antall forekomster av i treet. Kan ikke være null
+     * @return en integer som representerer antall forekomster av verdien
+     */
     public int antall(T verdi)
     {
         int antall = 0;
         java.util.Deque<Node<T>> stack = new java.util.ArrayDeque<>(this.antall);
         stack.addFirst(rot);
 
+        // Løper gjennom treet med bruk av hjelpestakk. Sjekker antallet forekomster av
+        // verdi i innorden rekkefølge
         while (!stack.isEmpty()) {
 
             Node<T> node = stack.removeFirst();
