@@ -536,26 +536,37 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
+    /**
+     * Metode som lager en string av treets nodeverdier i postorden rekkefølge
+     * @return String bestående av treets nodeverdier, postorden
+     */
     public String postString() {
-        Stack<Node<T>> stakk = new Stack();
+
         Node<T> node = rot;
+        Stack<Node<T>> stakk = new Stack();
         StringJoiner sj = new StringJoiner(", ", "[", "]");
 
-        while (node != null || !stakk.empty()) {
-            while (node != null && (node.venstre != null || node.høyre != null) ) {
+        while (node != null || !stakk.empty()) {        // Termineringsbetingelse
+
+            while (node != null                         // Går til venstre helt til node er bladnode,
+                    && (node.venstre != null            // Alle noder som passeres på veien pushes på stakk
+                        || node.høyre != null) ) {
+
                 stakk.push(node);
                 node = node.venstre;
             }
 
-            if (node != null) sj.add(node.verdi.toString());
+            if (node != null) sj.add(node.verdi.toString());    //Legger verdi til returstrengen
 
-            while (!stakk.empty() && node == stakk.peek().høyre) {
-                node = stakk.pop();
+            while (!stakk.empty() && node == stakk.peek().høyre) {  // Dersom node er høyrebarn av øverste node på stakk
+                                                                    // settes node til sin forelder, og dennes verdi
+                node = stakk.pop();                                 // legges til returstrengen
                 sj.add(node.verdi.toString());
             }
 
-            if (stakk.empty()) node = null; else node = stakk.peek().høyre;
-        }
+            if (stakk.empty()) node = null;            // Vi er gjennom hele treet, terminerer ytre while-løkke
+            else node = stakk.peek().høyre;            // Sjekker om det er flere noder til høyre for øverste
+        }                                              // node på stakken
 
         return sj.toString();
     }
