@@ -1106,7 +1106,6 @@ public class Oblig3Test
         }
 
         tre.fjernHvis(x -> true);
-        System.out.println(tre.toString());
 
         if (!tre.toString().equals("[]"))
         {

@@ -658,6 +658,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         }
     } // BladnodeIterator
 
+/*
 
     public Node<T> firstLeaf(Node<T> p, Node<T> q) {
 
@@ -670,14 +671,14 @@ public class ObligSBinTre<T> implements Beholder<T> {
 
         return p;
     }
-
+*/
     public static void main(String[] args) {
         ObligSBinTre tre = new ObligSBinTre<>(Comparator.naturalOrder());
         int[] a = {4, 7, 2, 9, 4, 10, 8, 7, 4, 6, 1};
         for (int verdi : a) tre.leggInn(verdi);
 
-        Node<Integer> node = tre.firstLeaf(tre.rot, null);
-        System.out.println(node.verdi);
+        //Node<Integer> node = tre.firstLeaf(tre.rot, null);
+        //System.out.println(node.verdi);
     }
 
     static <T> Node<T> endreNode(Node<T> node) {return node.venstre;}
