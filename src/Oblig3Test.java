@@ -31,7 +31,7 @@ public class Oblig3Test
         antallFeil += oppgave7();
         antallFeil += oppgave8();
         antallFeil += oppgave9();
-        //antallFeil += oppgave10();
+        antallFeil += oppgave10();
 
         if (antallFeil == 0)
         {
@@ -1007,7 +1007,8 @@ public class Oblig3Test
         tre.leggInn(1); tre.leggInn(2);
         i = tre.iterator();
         Iterator<Integer> j = tre.iterator();
-        i.next(); i.remove();
+        i.next();
+        i.remove();
         try
         {
             j.next();
@@ -1105,6 +1106,7 @@ public class Oblig3Test
         }
 
         tre.fjernHvis(x -> true);
+        System.out.println(tre.toString());
 
         if (!tre.toString().equals("[]"))
         {

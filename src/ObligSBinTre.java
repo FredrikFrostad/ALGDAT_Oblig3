@@ -106,6 +106,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
     public boolean fjern(T verdi) {
         if (verdi == null) return false;    // treet har ingen nullverdier
 
+
         Node<T> p = rot, q = null;          // q skal være forelder til p
 
         while (p != null) {                 // leter etter verdi
@@ -223,12 +224,20 @@ public class ObligSBinTre<T> implements Beholder<T> {
         return antall;
     }
 
+
+    /**
+     * Metode som sjekker om teet er tomt ved hjelp av treets antall-variabel
+     * @return true dersom treet er tomt
+     */
     @Override
     public boolean tom()
     {
         return antall == 0;
     }
 
+    /**
+     * Metode som nulstiller et tre. Metoden nuller alle treets noder i postorden rekkefølge.
+     */
     @Override
     public void nullstill()
     {
@@ -239,6 +248,11 @@ public class ObligSBinTre<T> implements Beholder<T> {
             rot = null;
     }
 
+    /**
+     * Hjelpemetode for nullstilling av et tre. Metoden rekurserer gjennom et binærtre og nuller nodepekere
+     * i postorden rekkefølge. Dermed kan garbage collectoren rydde opp i minnet når metoden har kjørt.
+     * @param rot
+     */
     private void nullstillRec(Node<T> rot) {
         if (rot.venstre != null)
             nullstillRec(rot.venstre);
@@ -251,7 +265,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
-
+    /**
+     * Metode som tar en node som parameter og returnerer neste node inorden til parameternoden.
+     * Dersom vi er kommet til treets siste node returnerer metoden null. Dette må håndteres i metodekallet
+     * @param p noden vi ønsker å finne neste innorden node til
+     * @param <T> Generisk typedefinisjon
+     * @return neste innorden til parameternoden
+     */
     private static <T> Node<T> nesteInorden(Node<T> p)  {
 
         //Dersom p har et høyre subtre, ligger neste inorden til venstre i dette subtreet
@@ -275,10 +295,14 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
+    /**
+     * Metode som returnerer en strengrepresentasjon av treet
+     * @return en streng med treets innhold
+     */
     @Override
     public String toString() {
+        if (rot == null) return "[]";
         Node<T> node = rot;
-        if (node == null) return "[]";
 
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -536,7 +560,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
         {
             if (iteratorendringer != endringer) {
                 throw new ConcurrentModificationException
-                        ("listen er endret!");
+                        ("treet er endret!");
             }
             if (!hasNext()) throw new NoSuchElementException
                     ("det er ikke flere elementer i listen!");
@@ -544,11 +568,13 @@ public class ObligSBinTre<T> implements Beholder<T> {
             Node<T> nesteKandidat = nesteInorden(p);
 
             while (nesteKandidat != null &&
-                    (nesteKandidat.venstre != null || nesteKandidat.høyre != null)) {
+                    (nesteKandidat.venstre != null
+                            || nesteKandidat.høyre != null)) {
                 nesteKandidat = nesteInorden(nesteKandidat);
             }
                 removeOK = true;
                 T out = p.verdi;
+                q = p;
                 p = nesteKandidat;
                 return out;
         }
@@ -557,7 +583,27 @@ public class ObligSBinTre<T> implements Beholder<T> {
         @Override
         public void remove()
         {
-            throw new UnsupportedOperationException("Ikke kodet ennå!");
+            if (iteratorendringer != endringer)
+                throw new ConcurrentModificationException
+                        ("treet er endret!");
+            if (!removeOK)
+                throw new IllegalStateException
+                        ("kan ikke fjerne node, ulovlig tillstand!");
+
+            Node<T> node = q.forelder;
+
+            if (node != null) {
+                if (node.venstre != null && node.venstre.equals(q)) node.venstre = null;
+                else node.høyre = null;
+            }else {
+                rot = null;
+                q.verdi = null;
+                q = null;
+            }
+            endringer++;
+            iteratorendringer++;
+            antall--;
+            removeOK = false;
         }
     } // BladnodeIterator
 
